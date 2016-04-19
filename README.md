@@ -1,2 +1,3 @@
 # ageit
-Reddit ages in interactive format
+
+Inferred ages of subreddits.
