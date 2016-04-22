@@ -164,12 +164,12 @@ function setupGUI(config) {
 	$("#titletext").html(config.text.intro);
 
 	// More information
-	if (config.text.more) {
-		$("#information").html(config.text.more);
-	} else {
-		//hide more information link
-		$("#moreinformation").hide();
-	}
+    // if (config.text.more) {
+    //     $("#information").html(config.text.more);
+    // } else {
+    //     //hide more information link
+    //     $("#moreinformation").hide();
+    // }
 
 	// Legend
 
@@ -334,13 +334,17 @@ function configSigmaElements(config) {
     $GP.bg2 = $(sigInst._core.domElements.bg2);
     var a = [],
         b,x=1;
-		for (b in sigInst.clusters) a.push('<div style="line-height:12px"><a href="#' + b + '"><div style="width:40px;height:12px;border:1px solid #fff;background:' + b + ';display:inline-block"></div> Group ' + (x++) + ' (' + sigInst.clusters[b].length + ' members)</a></div>');
+		for (b in sigInst.clusters) {
+            a.push('<div style="line-height:12px"><a href="#' + b + '">'+
+                   '<div style="width:40px;height:12px;border:1px solid #fff;background:' + b + ';display:inline-block">'+
+                   '</div> Group ' + (x++) + ' (' + sigInst.clusters[b].length + ' members)</a></div>');
+       };
     //a.sort();
     $GP.cluster.content(a.join(""));
     b = {
-        minWidth: 400,
+        // minWidth: 300,
         maxWidth: 800,
-        maxHeight: 600
+        maxHeight: 600,
     };//        minHeight: 300,
     $("a.fb").fancybox(b);
     $("#zoom").find("div.z").each(function () {
@@ -440,13 +444,24 @@ function Search(a) {
         else {
             var exactMatchIndex = -1;
             sigInst.iterNodes(function (a) {
-                g.test(a.label.toLowerCase()) && c.push({
+                g.test(a.id.toLowerCase()) && c.push({
                     id: a.id,
-                    name: a.label
+                    name: a.id,
+                    label: a.label,
+                    age: a.attr.age,
+                    color: ((a.attr.age > 0)? a.color : 'rgb(128,128,128)')
                 });
-                if (a.label.toLowerCase() == lastSearchTerm) {
+                if (a.id.toLowerCase() == lastSearchTerm) {
                     exactMatchIndex = c.length - 1;
-                }
+                };
+                
+                // g.test(a.label.toLowerCase()) && c.push({
+                //     id: a.id,
+                //     name: a.label
+                // });
+                // if (a.label.toLowerCase() == lastSearchTerm) {
+                //     exactMatchIndex = c.length - 1;
+                // }
             });
             // c is our results list. Let's sort it, putting any exact match at the top
             if (exactMatchIndex != -1) {
@@ -461,7 +476,11 @@ function Search(a) {
 
             c.length ? (b = !0, nodeActive(c[0].id)) : b = showCluster(a);
             a = ["<b>Search Results: </b>"];
-            if (1 < c.length) for (var d = 0, h = c.length; d < h; d++) a.push('<a href="#' + c[d].name + '" onclick="nodeActive(\'' + c[d].id + "')\">" + c[d].name + "</a>");
+            if (1 < c.length) {
+                for (var d = 0, h = c.length; d < h; d++) {
+                    a.push('<a href="#' + c[d].id + '"   style="color: '+c[d].color+'"     onclick="nodeActive(\'' + c[d].id + "')\">" + c[d].label + "</a>");
+                };
+            };
             0 == c.length && !b && a.push("<i>No results found.</i>");
             1 < a.length && this.results.html(a.join(""));
         }
@@ -501,7 +520,10 @@ function Cluster(a) {
     }
 }
 function showGroups(a) {
-    a ? ($GP.intro.find("#showGroups").text("Hide groups"), $GP.bg.show(), $GP.bg2.hide(), $GP.showgroup = !0) : ($GP.intro.find("#showGroups").text("View Groups"), $GP.bg.hide(), $GP.bg2.show(), $GP.showgroup = !1)
+    a ? ($GP.intro
+            .find("#showGroups")
+            .text("Hide groups"), $GP.bg.show(), $GP.bg2.hide(), $GP.showgroup = !0) : 
+        ($GP.intro.find("#showGroups").text("View Groups"), $GP.bg.hide(), $GP.bg2.show(), $GP.showgroup = !1)
 }
 
 function nodeNormal() {
@@ -529,7 +551,8 @@ function nodeActive(a) {
     sigInst.position(0, 0, 1).draw();  // Hack to get correct coords
     var b = sigInst._core.graph.nodesIndex[a];
     // Zoom in on active node location
-    sigInst.goTo(b.displayX, b.displayY, config.sigma.mouseProperties.maxRatio / 2);
+    // ME dont zoom?
+    // sigInst.goTo(b.displayX, b.displayY, config.sigma.mouseProperties.maxRatio / 2);
 
     showGroups(!1);
 	var outgoing={},incoming={},mutual={}, _neighbours = {};//SAH
@@ -537,7 +560,7 @@ function nodeActive(a) {
         if (a == b.source || a == b.target) {
             b.hidden = false;
             n={
-                name: b.label,
+                name: b.id,
                 colour: b.color
             };
             sigInst.neighbors[a == b.target ? b.source : b.target] = n;
@@ -585,9 +608,12 @@ function nodeActive(a) {
         d.attr.color = c[g].colour;
         a != g && e.push({
             id: g,
-            name: d.label,
+            name: d.id,
+            age:d.attr.age,
+            label: d.label,
             group: (c[g].name)? c[g].name:"",
-            colour: c[g].colour
+            colour: c[g].colour,
+            color: ((d.attr.age > 0) ? d.color : 'rgb(128,128,127)')
         })
     }
     /*
@@ -611,7 +637,7 @@ function nodeActive(a) {
 				d = c.group;
 				f.push('<li class="cf" rel="' + c.color + '"><div class=""></div><div class="">' + d + "</div></li>");
 			}*/
-			f.push('<li class="membership"><a href="#' + c.name + '" onmouseover="sigInst._core.plotter.drawHoverNode(sigInst._core.graph.nodesIndex[\'' + c.id + '\'])\" onclick=\"nodeActive(\'' + c.id + '\')" onmouseout="sigInst.refresh()">' + c.name + "</a></li>");
+			f.push('<li class="membership"><a style="color:'+c.color+'" href="#' + c.name + '" onmouseover="sigInst._core.plotter.drawHoverNode(sigInst._core.graph.nodesIndex[\'' + c.id + '\'])\" onclick=\"nodeActive(\'' + c.id + '\')" onmouseout="sigInst.refresh()">' + c.label + "</a></li>");
 		}
 		return f;
 	}
@@ -654,6 +680,7 @@ function nodeActive(a) {
         var a = $(this),
             b = a.attr("rel");
     });
+    console.log(b);
     f = b.attr;
     if (f.attributes) {
   		var image_attribute = false;
@@ -680,7 +707,7 @@ function nodeActive(a) {
 		var SRimage = null;
 		var SRdesc = "";
 		
-		jQuery.getJSON("http://www.reddit.com/r/" + b.label + "/about.json?jsonp=?",
+		jQuery.getJSON("http://www.reddit.com/r/" + b.id + "/about.json?jsonp=?",
 			function parse(data)
 			{
 				SRimage = data.data.header_img;
@@ -688,20 +715,32 @@ function nodeActive(a) {
 			}
         )
         .success(function() { ; })
-        .error(function() { SRimage = "http://metareddit.com/static/logos/" + b.label + ".png"; SRdesc = ""; })
+        .error(function() { SRimage = "http://metareddit.com/static/logos/" + b.id + ".png"; SRdesc = ""; })
         .complete(function() {
 			if (SRdesc == null) { SRdesc = ""; }
-			if (SRimage == null) { SRimage = "http://metareddit.com/static/logos/" + b.label + ".png"; }
+			if (SRimage == null) { SRimage = "http://metareddit.com/static/logos/" + b.id + ".png"; }
 			
 			$('#subreddit-logo').attr('src', SRimage);
-			$('#subreddit-logo').attr('alt', b.label);
-			$('#subreddit-logo').attr('title', b.label);
+			$('#subreddit-logo').attr('alt', b.id);
+			$('#subreddit-logo').attr('title', b.id);
 
 			if (image_attribute) {
 				//image_index = jQuery.inArray(image_attribute, temp_array);
-				$GP.info_name.html("<div><img src=" + f.attributes[image_attribute] + " style=\"vertical-align:middle\" /> <span onmouseover=\"sigInst._core.plotter.drawHoverNode(sigInst._core.graph.nodesIndex['" + b.id + '\'])" onmouseout="sigInst.refresh()">' + b.label + "</span></div>");
+                $GP.info_name.html('<div><img src=' + f.attributes[image_attribute] + ' style="vertical-align:middle;"/>'+
+                                   '<span onmouseover="sigInst._core.plotter.drawHoverNode(sigInst._core.graph.nodesIndex[' + b.id + '])" onmouseout="sigInst.refresh()">'+
+                                   b.id + '</span></div>');
+   				// $GP.info_name.html("<div><img src=" + f.attributes[image_attribute] + " style=\"vertical-align:middle;\" /> <span onmouseover=\"sigInst._core.plotter.drawHoverNode(sigInst._core.graph.nodesIndex['" + b.id + '\'])" onmouseout="sigInst.refresh()">' + b.id + "</span></div>");
+                                   
 			} else {
-				$GP.info_name.html("<div><span onmouseover=\"sigInst._core.plotter.drawHoverNode(sigInst._core.graph.nodesIndex['" + b.id + '\'])" onmouseout="sigInst.refresh()"><a target="_blank" title="Go to /r/' + b.label + '" href="http://reddit.com/r/' + b.label + '/">' + b.label + ' <i class="icon-external-link"></i></a><br /><br />' + SRdesc + '</span></div>');
+                $GP.info_name.html('<div><span onmouseover="sigInst._core.plotter.drawHoverNode(sigInst._core.graph.nodesIndex[' + b.id + '])" onmouseout="sigInst.refresh()">'+
+                                   '<a target="_blank" style="color:'+b.color+'" title="Go to /r/' + b.id + '" href="http://reddit.com/r/' + b.id + '">' + 
+                                   b.id + ' <i class="icon-external-link"></i></a>'+
+                                   '<br /> Median Age: '+b.attr.age.toFixed(2)+
+                                   '<br /><br />' + SRdesc + '</span></div>');
+                
+                
+                
+				// $GP.info_name.html("<div><span onmouseover=\"sigInst._core.plotter.drawHoverNode(sigInst._core.graph.nodesIndex['" + b.id + '\'])" onmouseout="sigInst.refresh()"><a target="_blank" style="'+b.color+'" title="Go to /r/' + b.id + '" href="http://reddit.com/r/' + b.id + '/">' + b.id + ' <i class="icon-external-link"></i></a><br /><br />' + SRdesc + '</span></div>');
 			}
 			// Image field for attribute pane
 			$GP.info_data.html(e.join("<br/>"));
@@ -715,7 +754,7 @@ function nodeActive(a) {
     sigInst.position(0, 0, 1).draw();
 	$GP.info_donnees.show({complete: hideLoading});
     sigInst.active = a;
-    window.location.hash = b.label;
+    window.location.hash = b.id;
 }
 
 function showCluster(a) {
@@ -734,7 +773,8 @@ function showCluster(a) {
         });
         for (var f = [], e = [], c = 0, g = b.length; c < g; c++) {
             var d = sigInst._core.graph.nodesIndex[b[c]];
-            !0 == d.hidden && (e.push(b[c]), d.hidden = !1, d.attr.lineWidth = !1, d.attr.color = d.color, f.push('<li class="membership"><a href="#'+d.label+'" onmouseover="sigInst._core.plotter.drawHoverNode(sigInst._core.graph.nodesIndex[\'' + d.id + "'])\" onclick=\"nodeActive('" + d.id + '\')" onmouseout="sigInst.refresh()">' + d.label + "</a></li>"))
+            !0 == d.hidden && (e.push(b[c]), d.hidden = !1, d.attr.lineWidth = !1, d.attr.color = d.color, 
+                        f.push('<li class="membership"><a style="color:'+d.color+'" href="#'+d.id+'" onmouseover="sigInst._core.plotter.drawHoverNode(sigInst._core.graph.nodesIndex[\'' + d.id + "'])\" onclick=\"nodeActive('" + d.id + '\')" onmouseout="sigInst.refresh()">' + d.label + "</a></li>"))
         }
         sigInst.clusters[a] = e;
         sigInst.draw(2, 2, 2, 2);

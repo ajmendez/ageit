@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en" xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml" itemscope itemtype="http://schema.org/Map">
 
 <head>
-<title>redditviz | reddit interest network</title>
+<title>ageit: age | subreddit</title>
 <link rel="shortcut icon" href="img/RViz.png" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta charset="utf-8">
@@ -17,7 +17,8 @@
   <script src="js/fancybox/jquery.fancybox.pack.js" type="text/javascript" language="javascript"></script>
   <script src="js/main.js" type="text/javascript" language="javascript"></script>
 
-  <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+  <link href="//fonts.googleapis.com/css?family=Lobster" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="screen" />
   <link rel="stylesheet" href="css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="js/fancybox/jquery.fancybox.css"/>
@@ -33,7 +34,7 @@
     <div class="loading">
         <h2 id="loading-msg">Loading</h2>
         <div id="loading-img"><img src="img/loading.gif" /></div>
-        <h2 id="loading-msg">If it stays loading too long,<br />try refreshing</h2>
+        <h2 id="loading-msg">Beta Version: Try a refreshing refresh if nothing happens!</h2>
     </div>
     <div class="sigma-expand" id="sigma-canvas"></div>
 </div>
@@ -50,30 +51,35 @@
   <div class="col">
         <!-- <div id="maintitle"></div> -->
     <div id="title"></div>
-    <div id="titletext"></div>
-    <div class="info cf">
+    <!-- <div id="titletext"></div> -->
+    <div id='colorbar'>
+        <img src='img/colorbar.png'>
+    </div>
+    <div id='moreinfo'>
+        <a href="#information" class="line fb">More about this visualization</a>
+    </div>
+    <!-- <div class="info cf">
       <dl>
         <dt class="moreinformation"></dt>
-        <dd class="line"><a href="#information" class="line fb">More about this visualization</a></dd>
+        <dd class="line"></dd>
       </dl>
+    </div> -->
+<!-- <div id="legend">
+    <div class="box">
+        <h2>Legend:</h2>
+        <dl>
+        <dt class="node"></dt>
+        <dd></dd>
+        <dt class="colours"></dt>
+        <dd></dd>
+        </dl>
     </div>
-<div id="legend">
-	<div class="box">
-		<h2>Legend:</h2>
-		<dl>
-		<dt class="node"></dt>
-		<dd></dd>
-		<dt class="colours"></dt>
-		<dd></dd>		
-		</dl>
-	</div>
-</div> 
+</div>  -->
     <div class="b1">
     <form>
       <div id="search" class="cf">
-          <h2>Search:</h2>
         <input type="text" name="search" value="Search by name" class="empty"/>
-        <div class="state"></div>
+        <div class="state fa fa-2x"></div>
         <div class="results"></div>
       </div>
       <div class="cf" id="attributeselect"><h2>Group Selector:</h2>
@@ -84,14 +90,46 @@
     </div>
   </div>
   <div id="information">
+      <h3>ageit</h3>
+      <p>
+          An interactive visualization of the median age of different reddit communities.
+          Median ages estimated from usernames, more details shortly.
+          Purple and blues dots show younger communities (~18).
+          Orange and Red dots show older communities (~30).
+          
+      </p>
+      <br /><br />
+      <p>
+          The clustering (locations) of reddit communities are from reddit user <a href="http://www.reddit.com/u/rhiever">rhiever</a> in October 2013. 
+          The points are grouped together by users with common interested and sized by their weighted PageRank value. 
+          See the <a href="http://peerj.com/articles/cs-4/">research article</a> on the method used to create redditviz.
+          It may be distributed under a <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a> license. 
+      </p>
+      <p>
+          This website is powered by <a class="sigma-font" target="_blank" href="http://sigmajs.org">sigma.js</a> 
+          and built on templates provided by <a href="http://redditstuff.github.io/sna/" target="_blank">sharkbait784</a> and OII/JISC.
+      </p>
+      <br />
+      <div id="template-info">
+          <a href="http://www.oii.ox.ac.uk" title="Oxford Internet Institute"><div id="oii"><span>OII</span></div></a>
+          <a href="http://jisc.ac.uk" title="JISC"><div id="jisc"><span>JISC</span></div></a>
+      </div>
+      <div id="copyright-info"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+          <img alt="Creative Commons License" style="border-width:0\" src="img/CC.png"></a>
+      </div>
+      
+      
   </div>
 </div>
-	<div id="copyright">
-		<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="img/CC.png" /></a></div>
-	</div>
+
+
+
+<div id="copyright">
+	<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="img/CC.png" /></a></div>
+</div>
 <div id="attributepane">
 <div class="text">
-	<div title="Close" class="left-close returntext"><div class="c cf"><span>Return to the full network</span></div></div>	
+	<div title="Close" class="left-close returntext"><div class="c cf"><span>Return to all</span></div></div>	
 <div class="headertext">
     <img id="subreddit-logo" onerror="this.src='http://www.redditstatic.com/about/assets/reddit-logo.png'"/>
 </div>	
@@ -109,7 +147,9 @@
 <div id="developercontainer">
 	<!-- reddit <script type="text/javascript" src="http://www.reddit.com/static/button/button1.jsx"></script>-->
     <div id="sigma-brand">
-        Powered by <span class="sigma-font">sigma.js</span>
+        ages from <a href='//ajmendez.github.io'>mendez</a> 
+        | clustering from <a href='http://www.reddit.com/u/rhiever'>rhiever</a> 
+        | powered by <span class="sigma-font">sigma.js</span>
     </div>
 </div>
 <script src="js/bootstrap.min.js"></script>
