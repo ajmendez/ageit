@@ -707,7 +707,7 @@ function nodeActive(a) {
 		var SRimage = null;
 		var SRdesc = "";
 		
-		jQuery.getJSON("http://www.reddit.com/r/" + b.id + "/about.json?jsonp=?",
+		jQuery.getJSON("//www.reddit.com/r/" + b.id + "/about.json?jsonp=?",
 			function parse(data)
 			{
 				SRimage = data.data.header_img;
